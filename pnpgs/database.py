@@ -8,9 +8,12 @@ from .postgre import PostgreTable
 from .enums import *
 
 class Database:
-    def __init__(self, database=None, username=None, password=None,
+    def __init__(self, database=None, username=None, password=None, host=None,
                  create_db_if_notexists: bool = True) -> None:
         self.connect_string_list = []
+        if host:
+            _host_string = f"host={host}"
+            self.connect_string_list.append(_host_string)
         if username:
             _user_string = f'user={username}'
             self.connect_string_list.append(_user_string)
