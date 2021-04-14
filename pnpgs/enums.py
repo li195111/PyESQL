@@ -26,6 +26,7 @@ class Method(Enum):
     INDEX = 6
     ON = 7
     CONCURRENTLY = 8
+    AND = 9
 
 
 class Mark(Enum):
