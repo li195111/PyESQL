@@ -81,6 +81,14 @@ class Database:
         if return_values:
             return sql, values
         return sql
+    
+    def _itemsvalue_string(self, items, values):
+        update_str = []
+        for idx,(i, v) in enumerate(zip(items,values)):
+            update_str.append(f"{i}='{v}'")
+            if idx > 0:
+                update_str.append(",")
+        return update_str
 
     def _select_items_condition_sql(self, table: str = None, items: list = None, conditions: Union[dict, list] = None, base_method: BaseMethod = BaseMethod.SELECT):
         if isinstance(items, list) or isinstance(items, tuple):
@@ -128,15 +136,15 @@ class Database:
         sql.append(db_name)
         return self._execute(self._to_sql_string(sql), autocommit=True, conn_str=conn_str)
 
-    def _update_item(self, table, update_item, update_value, conditions: dict = None, base_method: BaseMethod = BaseMethod.UPDATE):
-        sql = [base_method, table, Method.SET, update_item, "=", "?"]
-        values = [update_value]
+    def _update_item(self, table, update_item:list, update_value:list, conditions: dict = None, base_method: BaseMethod = BaseMethod.UPDATE):
+        sql = [base_method, table, Method.SET]
+        update_str = self._itemsvalue_string(update_item, update_value)
+        sql.extend(update_str)
         if isinstance(conditions, dict) and len(conditions) > 0:
-            condition_sql, condition_values = self._condition_string(
-                conditions, return_values=True)
+            condition_sql = self._condition_string(
+                conditions, return_values=False)
             sql.extend(condition_sql)
-            values.extend(condition_values)
-            self._execute(self._to_sql_string(sql), values)
+            self._execute(self._to_sql_string(sql))
 
     def _delete_item_condition(self, table, conditions: dict, base_method: BaseMethod = BaseMethod.DELETE):
         if isinstance(conditions, dict) and len(conditions) > 0:
