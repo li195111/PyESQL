@@ -120,7 +120,7 @@ class Database:
         if isinstance(values[-1], list) or isinstance(values[-1], tuple):
             value_string = []
             for vals in values:
-                value_string.append(','.join([str(val) for val in vals]))
+                value_string.append('(' + ','.join(["'"+str(val)+"'" for val in vals]) + ')')
             value_string = ','.join(value_string)
         else:
             value_string = str(tuple([str(val) for val in values]))
