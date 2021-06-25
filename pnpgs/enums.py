@@ -1,6 +1,6 @@
-from enum import Enum
+from enum import Enum, IntEnum
 
-class BaseMethod(Enum):
+class BaseMethod(IntEnum):
     CREATE = 0
     SELECT = 1
     INSERT = 2
@@ -11,12 +11,12 @@ class BaseMethod(Enum):
     EXPLAIN = 7
 
 
-class DBObj(Enum):
+class DBObj(IntEnum):
     DATABASE = 0
     TABLE = 1
 
 
-class Method(Enum):
+class Method(IntEnum):
     FROM = 0
     INTO = 1
     IF = 2
@@ -27,9 +27,11 @@ class Method(Enum):
     ON = 7
     CONCURRENTLY = 8
     AND = 9
+    ORDER = 10
+    BY = 11
+    BETWEEN = 12
 
-
-class Mark(Enum):
+class Mark(IntEnum):
     NOT = 0
     EXISTS = 1
 
@@ -37,3 +39,7 @@ class TableProperty(Enum):
     EMPTY = ""
     NOT_NULL = "NOT NULL"
     PRIMARY_KEY = "PRIMARY KEY"
+    
+class Order(IntEnum):
+    DESC = 0
+    ASC = 1

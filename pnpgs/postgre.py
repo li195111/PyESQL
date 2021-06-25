@@ -24,3 +24,16 @@ class PostgreTable:
         else:
             raise ValueError(f'Unknow Data Type for file path: {file_path}')
         
+    @classmethod
+    def from_json_str(cls, data):
+        datas = json.loads(data)
+        if isinstance(datas,list):
+            return [cls(**data) for data in datas]
+        elif isinstance(datas,dict):
+            return cls(**datas)
+        else:
+            raise ValueError(f'Unknow Data Type for data: {data}')
+        
+    @classmethod
+    def from_dict(cls, data):
+        return cls(**data) 

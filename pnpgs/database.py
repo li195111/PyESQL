@@ -1,11 +1,12 @@
+from datetime import datetime
+from .enums import *
+from .postgre import PostgreTable
+import psycopg2
 from typing import Union
 
 import warnings
 warnings.filterwarnings("ignore", category=UserWarning)
-import psycopg2
 
-from .postgre import PostgreTable
-from .enums import *
 
 class Database:
     def __init__(self, database=None, username=None, password=None, host=None,
@@ -81,16 +82,16 @@ class Database:
         if return_values:
             return sql, values
         return sql
-    
+
     def _itemsvalue_string(self, items, values):
         update_str = []
-        for idx,(i, v) in enumerate(zip(items,values)):
-            update_str.append(f"{i}='{v}'")
+        for idx, (i, v) in enumerate(zip(items, values)):
             if idx > 0:
                 update_str.append(",")
+            update_str.append(f"{i}='{v}'")
         return update_str
 
-    def _select_items_condition_sql(self, table: str = None, items: list = None, conditions: Union[dict, list] = None, base_method: BaseMethod = BaseMethod.SELECT):
+    def _select_items_condition_sql(self, table: str = None, items: list = None, conditions: Union[dict, list] = None, base_method: BaseMethod = BaseMethod.SELECT) -> list:
         if isinstance(items, list) or isinstance(items, tuple):
             items = ','.join(items)
         sql = [base_method]
@@ -120,7 +121,8 @@ class Database:
         if isinstance(values[-1], list) or isinstance(values[-1], tuple):
             value_string = []
             for vals in values:
-                value_string.append('(' + ','.join(["'"+str(val)+"'" for val in vals]) + ')')
+                value_string.append(
+                    '(' + ','.join(["'"+str(val)+"'" for val in vals]) + ')')
             value_string = ','.join(value_string)
         else:
             value_string = str(tuple([str(val) for val in values]))
@@ -136,7 +138,7 @@ class Database:
         sql.append(db_name)
         return self._execute(self._to_sql_string(sql), autocommit=True, conn_str=conn_str)
 
-    def _update_item(self, table, update_item:list, update_value:list, conditions: dict = None, base_method: BaseMethod = BaseMethod.UPDATE):
+    def _update_item(self, table, update_item: list, update_value: list, conditions: dict = None, base_method: BaseMethod = BaseMethod.UPDATE):
         sql = [base_method, table, Method.SET]
         update_str = self._itemsvalue_string(update_item, update_value)
         sql.extend(update_str)
@@ -149,10 +151,10 @@ class Database:
     def _delete_item_condition(self, table, conditions: dict, base_method: BaseMethod = BaseMethod.DELETE):
         if isinstance(conditions, dict) and len(conditions) > 0:
             sql = [base_method, Method.FROM, table]
-            condition_sql, values = self._condition_string(
-                conditions, return_values=True)
+            condition_sql = self._condition_string(
+                conditions, return_values=False)
             sql.extend(condition_sql)
-            self._execute(self._to_sql_string(sql), values)
+            self._execute(self._to_sql_string(sql))
         else:
             raise ValueError(
                 "'conditions' value must be condition dict and at least one condition")
@@ -177,7 +179,7 @@ class Database:
         if self.check_database_exists(db_name=db_name):
             return self._edit_database(BaseMethod.DROP, db_name=db_name, args=[Method.IF, Mark.EXISTS], conn_str=self.connect_str_without_db)
 
-    def create_table(self, table_name=None, columns=None, datatypes=None, properties=None, postgretable:PostgreTable=None, base: BaseMethod = BaseMethod.CREATE):
+    def create_table(self, table_name=None, columns=None, datatypes=None, properties=None, postgretable: PostgreTable = None, base: BaseMethod = BaseMethod.CREATE):
         if postgretable:
             table_name = postgretable.table_name
             columns = postgretable.table_columns
@@ -185,7 +187,8 @@ class Database:
             properties = postgretable.table_properties
         else:
             if not table_name and not columns and not datatypes and not properties:
-                raise ValueError(f"'table_name', 'columns', 'datatypes', 'properties' must not None, but got {table_name} {columns} {datatypes} {properties}")
+                raise ValueError(
+                    f"'table_name', 'columns', 'datatypes', 'properties' must not None, but got {table_name} {columns} {datatypes} {properties}")
         sql = [base, DBObj.TABLE]
         sql += [Method.IF, Mark.NOT, Mark.EXISTS]
         sql.append(table_name)
@@ -196,15 +199,24 @@ class Database:
         formated_string = ",".join(format_strings)
         sql.append(f"({formated_string})")
         return self._execute(self._to_sql_string(sql))
-    
-    def drop_table(self, table_name, base:BaseMethod=BaseMethod.DROP):
-        sql = [base,DBObj.TABLE]
+
+    def drop_table(self, table_name, base: BaseMethod = BaseMethod.DROP):
+        sql = [base, DBObj.TABLE]
         sql += [Method.IF, Mark.EXISTS]
         sql.append(table_name)
         return self._execute(self._to_sql_string(sql))
 
-    def select_items(self, table: str, items: Union[str, list, tuple], conditions: dict = None, conn_str=None):
+    def select_items(self, table: str, items: Union[str, list, tuple], conditions: dict = None, order_by: str = None, order: Order = Order.DESC, conn_str=None):
         sql = self._select_items_condition_sql(table, items, conditions)
+        if order_by:
+            sql.extend([Method.ORDER, Method.BY, order_by, order.name])
+        return self._execute(self._to_sql_string(sql), fetchall=True, conn_str=conn_str)
+
+    def select_counts_in_time(self, table: str, items, count_name, time_name, date_start:datetime, date_end:datetime, conn_str=None):
+        sql = self._select_items_condition_sql(
+            table, f'count({table}.{items})')
+        sql.insert(2,f"as {count_name}")
+        sql += [Method.WHERE, time_name, Method.BETWEEN, f"'{date_start}'", Method.AND, f"'{date_end}'"]
         return self._execute(self._to_sql_string(sql), fetchall=True, conn_str=conn_str)
 
     def insert_item(self, table, items, values):
