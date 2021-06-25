@@ -2,6 +2,7 @@ import setuptools
 from setuptools import setup
 
 dependencies = [
+    "psycopg2-binary",
     "psycopg2"
 ]
 
