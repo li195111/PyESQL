@@ -18,7 +18,7 @@ setup (
     url='https://github.com/li195111/PyESQL',
     author='Yue Li',
     author_email='green07111@gmail.com',
-    install_requirements=dependencies,
+    install_requires=dependencies,
     lincense='MIT',
     packages=packages,
     zip_safe=False,
