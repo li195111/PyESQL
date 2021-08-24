@@ -4,8 +4,8 @@ from datetime import datetime
 from sqlite3 import Error
 from typing import List, Union
 
-from enums import BaseMethod, DBObj, Mark, Method, Order
-from lite3 import SQLite3Table
+from .enums import BaseMethod, DBObj, Mark, Method, Order
+from .lite3 import SQLite3Table
 
 
 class Database:
