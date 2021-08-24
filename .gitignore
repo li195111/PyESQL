@@ -131,3 +131,4 @@ postgre_tables.json
 .vscode/
 .DS_Store
 t.py
+*.db
