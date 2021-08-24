@@ -33,13 +33,15 @@ class Database:
             return " ".join(sql) + ";"
         return " ".join(sql)
     
-    def _execute(self, sql, fetchall=False):
+    def _execute(self, sql, fetchall=False, fetchone=False):
         try:
             with contextlib.closing(sqlite3.connect(self.database_name)) as conn:
                 cursor = conn.cursor()
                 cursor.execute(sql)
                 if fetchall:
                      return cursor.fetchall()
+                if fetchone:
+                    return cursor.fetchone()
                 return conn.commit()
         except Error as e:
             print (e) 
@@ -173,10 +175,15 @@ class Database:
         sql = [base, DBObj.TABLE, table_name]
         return self._execute(self._to_sql_string(sql))
 
-    def select_items(self, table: str, items: Union[str, list, tuple], conditions: dict = None, order_by: str = None, order: Order = Order.DESC):
+    def select_items(self, table: str, items: Union[str, list, tuple], conditions: dict = None, 
+                     order_by: str = None, order: Order = Order.DESC,
+                     limit: int = None):
         sql = self._select_items_condition_sql(table, items, conditions)
-        if order_by:
-            sql.extend([Method.ORDER, Method.BY, order_by, order.name])
+        if limit:
+            sql.extend([Method.ORDER, Method.BY, order_by, order, Method.LIMIT, f"{limit}"])
+            return self._execute(self._to_sql_string(sql), fetchone=True)
+        elif order_by:
+            sql.extend([Method.ORDER, Method.BY, order_by, order])
         return self._execute(self._to_sql_string(sql), fetchall=True)
     
     def select_counts_in_time(self, table: str, items, count_name, time_name, date_start:datetime, date_end:datetime):

@@ -30,6 +30,7 @@ class Method(IntEnum):
     ORDER = 10
     BY = 11
     BETWEEN = 12
+    LIMIT = 13
 
 class Mark(IntEnum):
     NOT = 0
