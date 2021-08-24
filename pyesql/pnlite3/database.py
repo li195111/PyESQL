@@ -176,7 +176,7 @@ class Database:
         return self._execute(self._to_sql_string(sql))
 
     def select_items(self, table: str, items: Union[str, list, tuple], conditions: dict = None, 
-                     order_by: str = None, order: Order = Order.DESC,
+                     order_by: str = None, order: Union[Order,str] = 'desc',
                      limit: int = None):
         sql = self._select_items_condition_sql(table, items, conditions)
         if limit:
