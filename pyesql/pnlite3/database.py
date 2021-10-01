@@ -66,7 +66,7 @@ class Database:
             else:
                 cond_sql = f"{k}='{v}'"
             sql.append(cond_sql)
-            if len(conditions) > 1 & idx != len(conditions)-1:
+            if len(conditions) > 1 and idx != len(conditions)-1:
                 sql.append(Method.AND)
             values.append(v)
         if return_values:
