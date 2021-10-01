@@ -44,7 +44,7 @@ class Database:
                     return cursor.fetchone()
                 return conn.commit()
         except Error as e:
-            print (e) 
+            print (e,f"\nSQL: {sql}") 
             
     def _execute_value(self, sql, values, fetchall=False):
         try:
@@ -55,7 +55,7 @@ class Database:
                      return cursor.fetchall()
                 return conn.commit()
         except Error as e:
-            print (e) 
+            print (e,f"\nSQL: {sql}") 
             
     def _condition_string(self, conditions, return_values=False):
         sql = [Method.WHERE]
