@@ -212,7 +212,7 @@ class Database:
         if unique:
             sql.append(Mark.UNIQUE)
         sql += [Method.INDEX, Method.IF, Mark.NOT, Mark.EXISTS]
-        sql += [index_name, Method.ON, table_name]
+        sql += [index_name, Method.ON, f'"{table_name}"']
         if isinstance(column_names, str):
             sql.append(f"({column_names})")
         if isinstance(column_names, list) or isinstance(column_names, tuple):
