@@ -205,16 +205,17 @@ class Database:
         self._update_item(table, update_item, update_value, conditions)
         return
     
-    def create_index(self, index_name, table_name, column_names: Union[str, list, tuple], unlock=True, base: BaseMethod = BaseMethod.CREATE):
-        sql = [base, Method.INDEX]
-        if unlock:
-            sql.append(Method.CONCURRENTLY)
+    def create_index(self, index_name, table_name, column_names: Union[str, list, tuple], unique=False, base:BaseMethod=BaseMethod.CREATE):
+        sql = [base]
+        if unique:
+            sql.append(Mark.UNIQUE)
+        sql += [Method.INDEX, Method.IF, Mark.NOT, Mark.EXISTS]
         sql += [index_name, Method.ON, table_name]
         if isinstance(column_names, str):
             sql.append(f"({column_names})")
         if isinstance(column_names, list) or isinstance(column_names, tuple):
             sql.append(f"({','.join(column_names)})")
-        return sql
+        return self._execute(self._to_sql_string(sql))
 
     def custom_SQL(self,sql_string,fetchall=True,fetchone=False):
         return self._execute(sql_string,fetchall=fetchall,fetchone=fetchone)

@@ -35,6 +35,7 @@ class Method(IntEnum):
 class Mark(IntEnum):
     NOT = 0
     EXISTS = 1
+    UNIQUE = 2
 
 class TableProperty(Enum):
     EMPTY = ""
