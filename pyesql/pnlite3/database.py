@@ -216,6 +216,9 @@ class Database:
             sql.append(f"({','.join(column_names)})")
         return sql
 
+    def custom_SQL(self,sql_string,fetchall=True,fetchone=False):
+        return self._execute(sql_string,fetchall=fetchall,fetchone=fetchone)
+
 if __name__ == "__main__":
     # Create Database
     db = Database('camera_result.db')
