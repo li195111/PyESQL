@@ -33,13 +33,15 @@ class Database:
             return " ".join(sql) + ";"
         return " ".join(sql)
     
-    def _execute(self, sql, fetchall=False, fetchone=False):
+    def _execute(self, sql, fetchall=False, fetchone=False,nocommit=False):
         try:
             with contextlib.closing(sqlite3.connect(self.database_name)) as conn:
                 cursor = conn.cursor()
                 cursor.execute(sql)
+                if nocommit:
+                    return
                 if fetchall:
-                     return cursor.fetchall()
+                    return cursor.fetchall()
                 if fetchone:
                     return cursor.fetchone()
                 return conn.commit()
@@ -215,7 +217,7 @@ class Database:
             sql.append(f"({column_names})")
         if isinstance(column_names, list) or isinstance(column_names, tuple):
             sql.append(f"({','.join(column_names)})")
-        return self._execute(self._to_sql_string(sql))
+        return self._execute(self._to_sql_string(sql),nocommit=True)
 
     def custom_SQL(self,sql_string,fetchall=True,fetchone=False):
         return self._execute(sql_string,fetchall=fetchall,fetchone=fetchone)
