@@ -13,7 +13,7 @@ packages = [
 
 setup (
     name='pyesql',
-    version='0.2.5',
+    version='0.2.6',
     description='Python Easy SQL Connector',
     url='https://github.com/li195111/PyESQL',
     author='Yue Li',
