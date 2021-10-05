@@ -203,9 +203,8 @@ class Database:
         sql = self._delete_item_condition(table, conditions, compare_list)
         return self._execute(self._to_sql_string(sql))
     
-    def update_item(self, table: str, update_item: list, update_value: list, conditions: dict = None):
-        self._update_item(table, update_item, update_value, conditions)
-        return
+    def update_item(self, table: str, update_item: list, update_value: list, conditions: dict = None,*args,**kwargs):
+        self._update_item(table, update_item, update_value, conditions,*args, **kwargs)
     
     def create_index(self, index_name, table_name, column_names: Union[str, list, tuple], unique=False, base:BaseMethod=BaseMethod.CREATE):
         sql = [base]
