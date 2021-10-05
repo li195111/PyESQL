@@ -174,7 +174,7 @@ class Database:
         return self._execute(self._to_sql_string(sql))
 
     def drop_table(self, table_name, base: BaseMethod = BaseMethod.DROP):
-        sql = [base, DBObj.TABLE, table_name]
+        sql = [base,DBObj.TABLE,Method.IF,Mark.EXISTS,table_name]
         return self._execute(self._to_sql_string(sql))
 
     def select_items(self, table: str, items: Union[str, list, tuple], conditions: dict = None, 
@@ -217,8 +217,12 @@ class Database:
             sql.append(f"({column_names})")
         if isinstance(column_names, list) or isinstance(column_names, tuple):
             sql.append(f"({','.join(column_names)})")
-        return self._execute(self._to_sql_string(sql),nocommit=True)
+        return self._execute(self._to_sql_string(sql))
 
+    def drop_index(self,index_name, table_name, base:BaseMethod.DROP):
+        sql = [base,Method.INDEX,Method.IF,Mark.EXISTS,f"{table_name}.{index_name}"]
+        return self._execute(self._to_sql_string(sql))
+    
     def custom_SQL(self,sql_string,fetchall=True,fetchone=False):
         return self._execute(sql_string,fetchall=fetchall,fetchone=fetchone)
 
