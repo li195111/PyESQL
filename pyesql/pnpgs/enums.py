@@ -1,5 +1,8 @@
 from enum import Enum, IntEnum
 
+class ConnectionError(TimeoutError):
+    pass
+
 class BaseMethod(IntEnum):
     CREATE = 0
     SELECT = 1

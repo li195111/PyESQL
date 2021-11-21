@@ -53,6 +53,8 @@ class Database:
             conn.set_session(autocommit=autocommit)
             cursor = conn.cursor()
             cursor.execute(sql)
+            if autocommit:
+                conn.set_session(autocommit=False)
             if fetchall:
                 return cursor.fetchall()
             return conn.commit()
