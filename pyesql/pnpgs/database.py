@@ -49,25 +49,19 @@ class Database:
         self.connect_str = ' '.join(connect_str_with_db)
 
     def _execute(self, sql, fetchall=False, autocommit=False, conn_str=None, timeout=3):
-        res = cursor = conn = None
-        try:
-            conn = psycopg2.connect(self.connect_str if conn_str == None else conn_str, connect_timeout=timeout)
-            if autocommit:
-                conn.autocommit = True
-            cursor = conn.cursor()
-            cursor.execute(sql)
-            if fetchall:
-                res = cursor.fetchall()
-            else:
-                res = conn.commit()
-        except Exception as e:
-            print (e)
-        finally:
-            if not cursor is None:
-                cursor.close()
-            if not conn is None:
-                conn.close()
+        conn = psycopg2.connect(self.connect_str if conn_str == None else conn_str, connect_timeout=timeout)
+        if autocommit:
+            conn.autocommit = True
+        cursor = conn.cursor()
+        cursor.execute(sql)
+        if fetchall:
+            res = cursor.fetchall()
+        else:
+            res = conn.commit()
+        cursor.close()
+        conn.close()
         return res
+
 
     def _to_sql_string(self, sql_list: list, end=True) -> str:
         sql = []
@@ -178,7 +172,8 @@ class Database:
     def check_database_exists(self, db_name=None):
         if not db_name:
             db_name = self.database_name
-        return tuple([db_name]) in self.list_database_name()
+        db_names = self.list_database_name()
+        return tuple([db_name]) in db_names if not db_names is None else False
 
     def create_database(self, db_name=None) -> None:
         if not db_name:
