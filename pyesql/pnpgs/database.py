@@ -49,15 +49,25 @@ class Database:
         self.connect_str = ' '.join(connect_str_with_db)
 
     def _execute(self, sql, fetchall=False, autocommit=False, conn_str=None, timeout=3):
-        with psycopg2.connect(self.connect_str if conn_str == None else conn_str, connect_timeout=timeout) as conn:
-            conn.set_session(autocommit=autocommit)
+        res = cursor = conn = None
+        try:
+            conn = psycopg2.connect(self.connect_str if conn_str == None else conn_str, connect_timeout=timeout)
+            if autocommit:
+                conn.autocommit = True
             cursor = conn.cursor()
             cursor.execute(sql)
-            if autocommit:
-                conn.set_session(autocommit=False)
             if fetchall:
-                return cursor.fetchall()
-            return conn.commit()
+                res = cursor.fetchall()
+            else:
+                res = conn.commit()
+        except Exception as e:
+            print (e)
+        finally:
+            if not cursor is None:
+                cursor.close()
+            if not conn is None:
+                conn.close()
+        return res
 
     def _to_sql_string(self, sql_list: list, end=True) -> str:
         sql = []
