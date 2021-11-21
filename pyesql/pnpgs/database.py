@@ -2,6 +2,7 @@ from datetime import datetime
 from .enums import *
 from .postgre import PostgreTable
 import psycopg2
+from psycopg2 import OperationalError
 from typing import Union
 
 import warnings
@@ -47,8 +48,8 @@ class Database:
         connect_str_with_db.append(_database_string)
         self.connect_str = ' '.join(connect_str_with_db)
 
-    def _execute(self, sql, fetchall=False, autocommit=False, conn_str=None):
-        with psycopg2.connect(self.connect_str if conn_str == None else conn_str) as conn:
+    def _execute(self, sql, fetchall=False, autocommit=False, conn_str=None, timeout=3):
+        with psycopg2.connect(self.connect_str if conn_str == None else conn_str, connect_timeout=timeout) as conn:
             conn.set_session(autocommit=autocommit)
             cursor = conn.cursor()
             cursor.execute(sql)
