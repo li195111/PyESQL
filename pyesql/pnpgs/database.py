@@ -1,13 +1,9 @@
 from datetime import datetime
 from .enums import *
 from .postgre import PostgreTable
-import psycopg2
-from psycopg2 import OperationalError
+import psycopg
+from psycopg import OperationalError
 from typing import Union
-
-import warnings
-warnings.filterwarnings("ignore", category=UserWarning)
-
 
 class Database:
     def __init__(self, database=None, username=None, password=None, host=None,
@@ -49,7 +45,7 @@ class Database:
         self.connect_str = ' '.join(connect_str_with_db)
 
     def _execute(self, sql, fetchall=False, autocommit=False, conn_str=None, timeout=3):
-        conn = psycopg2.connect(self.connect_str if conn_str == None else conn_str, connect_timeout=timeout)
+        conn = psycopg.connect(self.connect_str if conn_str == None else conn_str, connect_timeout=timeout)
         if autocommit:
             conn.autocommit = True
         cursor = conn.cursor()
@@ -61,7 +57,6 @@ class Database:
         cursor.close()
         conn.close()
         return res
-
 
     def _to_sql_string(self, sql_list: list, end=True) -> str:
         sql = []
