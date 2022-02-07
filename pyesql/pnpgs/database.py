@@ -1,8 +1,12 @@
 from datetime import datetime
 from .enums import *
 from .postgre import PostgreTable
-import psycopg
-from psycopg import OperationalError
+try:
+    import psycopg
+    from psycopg import OperationalError
+except ModuleNotFoundError:
+    import psycopg2 as psycopg
+    from psycopg2 import OperationalError
 from typing import Union
 
 class Database:
