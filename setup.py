@@ -2,8 +2,8 @@ import setuptools
 from setuptools import setup
 
 dependencies = [
-    "psycopg",
-    "psycopg2-binary"
+    "psycopg ; platform_system!='Windows'",
+    "psycopg2-binary ; platform_system=='Windows'"
 ]
 
 packages = [
@@ -13,7 +13,7 @@ packages = [
 
 setup (
     name='pyesql',
-    version='0.2.18',
+    version='0.2.19',
     description='Python Easy SQL Connector',
     url='https://github.com/li195111/PyESQL',
     author='Yue Li',
